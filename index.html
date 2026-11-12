@@ -226,7 +226,7 @@
         const ctx = canvas.getContext('2d');
 
         // 【重要設定】請確認類別順序與你訓練模型時的 data.yaml 一致
-        const CLASSES = ['crosswalk', 'traffic_light'];
+        const CLASSES = ['crosswalk', 'traffic light'];
 
         // 1. 載入 ONNX 模型
         async function initModel() {
@@ -267,7 +267,7 @@
                     drawBoxes([]);
                 } else {
                     const cwCount = boxes.filter(b => b.className === 'crosswalk').length;
-                    const tlCount = boxes.filter(b => b.className === 'traffic_light').length;
+                    const tlCount = boxes.filter(b => b.className === 'traffic light').length;
                     drawBoxes(boxes);
                     statusDiv.innerText = `✅ 辨識完成！共找到 ${cwCount} 個斑馬線、${tlCount} 個紅綠燈。`;
                 }
