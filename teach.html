@@ -1,1 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edge AI 路口安全辨識 — 完整實作操作手冊</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #1e3c72;
+            --secondary-blue: #2a5298;
+        }
+        body {
+            font-family: "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            line-height: 1.7;
+        }
+        .navbar-custom {
+            background-color: var(--primary-blue);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+        .header-banner {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: white;
+            padding: 50px 20px;
+        }
+        .step-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            background: white;
+            overflow: hidden;
+        }
+        .step-header {
+            background-color: #eef2f8;
+            border-bottom: 2px solid #d0dcf0;
+            padding: 15px 25px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            font-size: 1.25rem;
+        }
+        .code-box {
+            background-color: #1e293b;
+            color: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 0.92rem;
+            position: relative;
+            overflow-x: auto;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
 
+    <!-- 導覽列 -->
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html">🚦 路口安全 AI 離線辨識系統</a>
+            <div class="ms-auto">
+                <a href="index.html" class="btn btn-warning btn-sm fw-bold">← 返回辨識測試首頁</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 標題橫幅 -->
+    <div class="header-banner text-center mb-5">
+        <div class="container">
+            <span class="badge bg-warning text-dark mb-2 px-3 py-2 fw-bold">實戰工作坊標準作業程序 (SOP)</span>
+            <h1 class="fw-bold mb-2">📖 Edge AI 道路安全辨識系統操作手冊</h1>
+            <p class="mb-0 text-white-50">從 Roboflow 資料集標註、Colab GPU 模型訓練到 GitHub Pages 純前端離線部署完整指南</p>
+        </div>
+    </div>
+
+    <div class="container" style="max-width: 960px;">
+
+        <!-- 步驟一：Roboflow -->
+        <div class="step-card">
+            <div class="step-header">第一階段：Roboflow 影像標註與資料擴增</div>
+            <div class="p-4">
+                <h5 class="fw-bold text-primary">1. 建立專案與資料標註 (Annotation)</h5>
+                <ul>
+                    <li>登入 <b>Roboflow</b>，建立 <b>Object Detection（物件偵測）</b>專案。</li>
+                    <li>設定目標類別名稱（例如：<code>crosswalk</code> 斑馬線、<code>traffic light</code> 紅綠燈）。</li>
+                    <li>使用 Bounding Box 緊密框選目標物體邊緣，避免包含過多無關背景雜訊。</li>
+                    <li>資料集切分比例建議設定為：<b>70% Train（訓練集）/ 20% Valid（驗證集）/ 10% Test（測試集）</b>。</li>
+                </ul>
+
+                <h5 class="fw-bold text-primary mt-4">2. 預處理 (Preprocessing) 與資料擴增 (Augmentation)</h5>
+                <div class="row g-3 mt-1">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded border h-100">
+                            <h6 class="fw-bold">⚙️ Preprocessing 必選設定</h6>
+                            <ul class="mb-0 small">
+                                <li><b>Auto-Orient</b>：自動修正手機拍攝 EXIF 旋轉方向。</li>
+                                <li><b>Resize (Stretch to 640x640)</b>：統一縮放為 YOLO 標準輸入尺寸。</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded border h-100">
+                            <h6 class="fw-bold">✨ Augmentation 推薦參數 (Outputs = 3)</h6>
+                            <ul class="mb-0 small">
+                                <li><b>Horizontal Flip</b>：水平翻轉，適應雙向車道視角。</li>
+                                <li><b>Brightness (±15%)</b>：整體明暗平移，模擬陰天與樹蔭。</li>
+                                <li><b>Exposure (±15%)</b>：曝光倍數調整，模擬烈日眩光。</li>
+                                <li><b>Blur (Up to 2.5px)</b>：模擬行車移動時的動態模糊。</li>
+                                <li class="text-danger fw-bold">⚠️ 注意：切勿勾選 Mosaic（避免切斷斑馬線連續條紋特徵）。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <p class="mt-3 mb-0 small text-muted">設定完成後點擊 <b>Generate ➔ Export Dataset</b>，格式選擇 <b>YOLOv8 / YOLO11 / YOLO26 (PyTorch)</b> 並複製下載程式碼。</p>
+            </div>
+        </div>
+
+        <!-- 步驟二：Google Colab -->
+        <div class="step-card">
+            <div class="step-header">第二階段：Google Colab 雲端 GPU 訓練與轉檔 ONNX</div>
+            <div class="p-4">
+                <div class="alert alert-warning small">
+                    <b>⚡ 啟動硬體加速：</b>開啟 Google Colab 後，點擊上方選單「執行階段 ➔ 變更執行階段類型」，務必選擇 <b>T4 GPU</b> 再開始執行。
+                </div>
+
+                <h6 class="fw-bold mt-3">1. 安裝 Ultralytics 套件並貼上 Roboflow 資料集程式碼</h6>
+                <div class="code-box mb-3">
+                    <button class="btn btn-outline-light btn-sm copy-btn" onclick="copyCode('code1')">複製</button>
+                    <pre id="code1" class="mb-0">!pip install ultralytics roboflow
+
+# 在下方貼上你從 Roboflow 複製的下載程式碼（包含 API Key）</pre>
+                </div>
+
+                <h6 class="fw-bold mt-3">2. 啟動模型訓練 (以輕量化 YOLO26n 為例)</h6>
+                <div class="code-box mb-3">
+                    <button class="btn btn-outline-light btn-sm copy-btn" onclick="copyCode('code2')">複製</button>
+                    <pre id="code2" class="mb-0">from ultralytics import YOLO
+
+# 載入預訓練權重（可依需求選用 yolo26n.pt 或 yolov8n.pt）
+model = YOLO('yolo26n.pt')
+
+# 開始訓練 50 輪，輸入解析度 640x640
+model.train(data='/content/datasets/data.yaml', epochs=50, imgsz=640, name='road_safety')</pre>
+                </div>
+
+                <h6 class="fw-bold mt-3">3. 匯出為網頁專用 ONNX 通用格式</h6>
+                <div class="code-box">
+                    <button class="btn btn-outline-light btn-sm copy-btn" onclick="copyCode('code3')">複製</button>
+                    <pre id="code3" class="mb-0"># 載入訓練完成的最佳權重並匯出為 best.onnx
+best_model = YOLO('/content/runs/detect/road_safety/weights/best.pt')
+best_model.export(format='onnx', imgsz=640)</pre>
+                </div>
+                <p class="mt-2 mb-0 small text-muted">執行完畢後，至左側檔案資料夾 <code>runs/detect/road_safety/weights/</code> 下載 <b><code>best.onnx</code></b> 至電腦。</p>
+            </div>
+        </div>
+
+        <!-- 步驟三：部署與本機測試 -->
+        <div class="step-card">
+            <div class="step-header">第三階段：前端網頁整合與 GitHub Pages 部署</div>
+            <div class="p-4">
+                <h6 class="fw-bold text-primary">1. 檔案資料夾結構</h6>
+                <p class="small">請確保以下三個檔案位於同一個專案根目錄下：</p>
+                <div class="code-box mb-3">
+<pre class="mb-0">📁 road-safety-ai/
+ ├── 📄 index.html       (主辨識測試網頁)
+ ├── 📄 crosswalk.html   (本操作教學手冊)
+ └── 🧠 best.onnx        (從 Colab 匯出的 AI 模型檔)</pre>
+                </div>
+
+                <h6 class="fw-bold text-primary">2. 本機測試指令（避開瀏覽器 CORS 安全性阻擋）</h6>
+                <p class="small mb-2">請勿直接雙擊開啟 <code>index.html</code>（<code>file://</code> 協定會阻擋讀取模型），請在專案資料夾開啟終端機執行：</p>
+                <div class="code-box mb-3">
+                    <button class="btn btn-outline-light btn-sm copy-btn" onclick="copyCode('code4')">複製</button>
+                    <pre id="code4" class="mb-0">python -m http.server 8000</pre>
+                </div>
+                <p class="small">開啟瀏覽器前往 <code>http://localhost:8000</code> 即可進行本機離線推理測試。</p>
+
+                <h6 class="fw-bold text-primary mt-3">3. 上傳 GitHub Pages 免費公開發布</h6>
+                <ol class="small mb-0">
+                    <li>登入 GitHub 建立新的公開倉庫（Public Repository），上傳 <code>index.html</code>、<code>crosswalk.html</code> 與 <code>best.onnx</code>。</li>
+                    <li>進入倉庫的 <b>Settings ➔ Pages</b>，將 Branch 設為 <b><code>main</code></b> 並點擊 Save。</li>
+                    <li>切換至頂部 <b>Actions</b> 頁籤，等待 <code>pages-build-deployment</code> 轉為<b>綠色勾勾 ✅</b> 即正式上線。</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- 步驟四：常見除錯指南 -->
+        <div class="step-card">
+            <div class="step-header">第四階段：常見問題與現場排錯指南 (Troubleshooting)</div>
+            <div class="p-4">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle mb-0 small">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 25%;">異常現象</th>
+                                <th style="width: 35%;">常見原因</th>
+                                <th style="width: 40%;">標準解決方案</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold text-danger">畫面顯示「模型載入失敗」</td>
+                                <td>直接雙擊開啟 HTML 檔案（CORS 阻擋），或 <code>best.onnx</code> 檔名/路徑不符。</td>
+                                <td>確認 <code>best.onnx</code> 與 <code>index.html</code> 在同一層目錄，並透過本機伺服器或 GitHub Pages 網址開啟。</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-danger">標籤名稱顯示顛倒（紅綠燈變斑馬線）</td>
+                                <td>網頁內的 <code>CLASSES</code> 陣列順序與模型訓練時的 <code>data.yaml</code> 相反。</td>
+                                <td>開啟 <code>index.html</code> 修改【模型區 1】的 <code>CLASSES</code> 陣列順序即可。</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-danger">遠處紅綠燈或斑馬線漏抓</td>
+                                <td>信心度門檻設太高，或小物件樣本不足。</td>
+                                <td>將【模型區 3】的 <code>confThreshold</code> 調降至 <code>0.25 ~ 0.35</code> 測試效果。</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-danger">網頁出現 404 或手機選單無法展開</td>
+                                <td>GitHub Pages 尚未部署完成、<code>index.html</code> 未放根目錄，或漏載 Bootstrap JS。</td>
+                                <td>檢查 GitHub <b>Actions</b> 綠色勾勾、確認 <code>bootstrap.bundle.min.js</code> 已引入，並用手機無痕視窗重整。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container">
+            <small class="text-white-50">Edge AI 道路安全辨識實務工作坊 &copy; 2026 教學手冊</small>
+        </div>
+    </footer>
+
+    <script>
+        function copyCode(id) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ 程式碼已複製到剪貼簿！');
+            });
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
