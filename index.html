@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>路口安全 AI 離線辨識系統 (紅綠燈 & 斑馬線)</title>
+    <title>路口安全 AI 離線辨識系統 (ONNX Runtime)</title>
     <!-- 引入 Bootstrap 5 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- 引入 ONNX Runtime Web CDN -->
@@ -21,13 +21,11 @@
             color: #333;
         }
 
-        /* 頂部導覽列 */
         .navbar-custom {
             background-color: var(--primary-blue);
             box-shadow: 0 2px 10px rgba(0,0,0,0.15);
         }
 
-        /* Hero 區塊 */
         .hero-banner {
             background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
             color: white;
@@ -35,7 +33,6 @@
             box-shadow: inset 0 -10px 20px rgba(0,0,0,0.05);
         }
 
-        /* 卡片美化 */
         .card-custom {
             border: none;
             border-radius: 12px;
@@ -47,18 +44,10 @@
             box-shadow: 0 8px 25px rgba(0,0,0,0.1);
         }
 
-        /* 指標卡片邊框 */
-        .stat-card-danger {
-            border-left: 5px solid #dc3545;
-        }
-        .stat-card-success {
-            border-left: 5px solid #198754;
-        }
-        .stat-card-info {
-            border-left: 5px solid #0d6efd;
-        }
+        .stat-card-danger { border-left: 5px solid #dc3545; }
+        .stat-card-success { border-left: 5px solid #198754; }
+        .stat-card-info { border-left: 5px solid #0d6efd; }
 
-        /* Canvas 視覺 */
         canvas {
             max-width: 100%;
             height: auto;
@@ -115,7 +104,10 @@
             <p class="lead mx-auto" style="max-width: 780px; color: #e2e8f0; font-size: 1.15rem;">
                 結合 YOLO 多目標物件偵測與靜態幾何規則引擎，同時定位路口號誌與斑馬線空間座標，自動評估退縮距離與視線死角風險。
             </p>
-            <a href="#system-demo" class="btn btn-warning btn-lg fw-bold mt-3 px-4 shadow">滑至頁尾體驗測試 🚀</a>
+            <div class="mt-3">
+                <a href="#system-demo" class="btn btn-warning btn-lg fw-bold px-4 shadow me-2">體驗離線辨識 🚀</a>
+                <a href="crosswalk.html" class="btn btn-outline-light btn-lg fw-bold px-4">查看完整操作手冊 📖</a>
+            </div>
         </div>
     </div>
 
@@ -147,14 +139,14 @@
                 <div class="col-lg-6">
                     <div class="card card-custom h-100 p-4 bg-white">
                         <h3 class="section-title text-primary">💡 營隊教學與架構延伸</h3>
-                        <p class="text-muted">本專案展示了完整的端到端（End-to-End）多類別 Edge AI 應用開發流程：</p>
+                        <p class="text-muted">本專案展示了完整的端到端（End-to-End）多類別 Edge AI 應用開發實踐流程：</p>
                         <ol class="list-group list-group-numbered list-group-flush mb-3">
-                            <li class="list-group-item bg-transparent"><b>多類別標註與訓練：</b>使用 Roboflow 標註斑馬線與紅綠燈，於 Google Colab 訓練 YOLO 模型。</li>
+                            <li class="list-group-item bg-transparent"><b>多類別標註與訓練：</b>使用 Roboflow 標註影像，並於 Google Colab 訓練 YOLO26 模型。</li>
                             <li class="list-group-item bg-transparent"><b>跨平台輕量化：</b>將 `.pt` 模型轉檔為跨平台 ONNX 通用格式。</li>
-                            <li class="list-group-item bg-transparent"><b>前端多目標解析：</b>透過 HTML5 + Canvas + JS 同時解析多組預測陣列並即時繪製不同色框。</li>
+                            <li class="list-group-item bg-transparent"><b>前端多目標解析：</b>透過 HTML5 + Canvas + JS 實現純地端推理與視覺化呈報。</li>
                         </ol>
                         <div class="alert alert-info mb-0 small">
-                            <b>👨‍💻 課堂體驗：</b>學員可開啟開發者工具修改 JS 門檻參數（`0.18` 或 `0.25`），親自調整決策邏輯！
+                            <b>👨‍💻 課堂實作提示：</b>模型接口集中於原始碼底部的 <code>&lt;script&gt;</code> 區塊（標註為【模型區 1～4】），學員可自行調整類別名稱與信心度門檻！
                         </div>
                     </div>
                 </div>
@@ -176,7 +168,7 @@
                     <div class="card card-custom p-4 h-100 bg-white">
                         <div class="fs-1 mb-2">🎯</div>
                         <h5 class="fw-bold">雙目標 YOLO 空間標定</h5>
-                        <p class="text-muted small mb-0">基於輕量化 YOLO 模型，同時定位道路影像中的斑馬線（Crosswalk）與紅綠燈（Traffic Light）。</p>
+                        <p class="text-muted small mb-0">基於輕量化 YOLO26 模型，同時定位道路影像中的斑馬線（Crosswalk）與紅綠燈（Traffic Light）。</p>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -189,7 +181,7 @@
             </div>
         </section>
 
-        <!-- 5. 【核心實作測試區塊】 -->
+        <!-- 5. 核心實作測試區塊 -->
         <section id="system-demo" class="mb-5">
             <div class="card card-custom p-4 bg-white">
                 <h3 class="section-title text-primary text-center mb-2">📷 紅綠燈 & 斑馬線離線 AI 辨識系統</h3>
@@ -199,7 +191,6 @@
                     <input class="form-control form-control-lg mb-2" type="file" id="imageInput" accept="image/*" style="max-width: 500px;" disabled>
                     <div id="status" class="fw-bold text-success my-2 fs-6">⏳ 正在載入 ONNX 模型中，請稍候...</div>
                     
-                    <!-- Canvas 畫布輸出區 -->
                     <div class="mt-3 text-center w-100">
                         <canvas id="outputCanvas"></canvas>
                     </div>
@@ -217,7 +208,7 @@
         </div>
     </footer>
 
-    <!-- JavaScript 邏輯程式碼（支援多類別：紅綠燈 + 斑馬線） -->
+    <!-- JavaScript 邏輯程式碼 -->
     <script>
         let session = null;
         const statusDiv = document.getElementById('status');
@@ -225,14 +216,20 @@
         const canvas = document.getElementById('outputCanvas');
         const ctx = canvas.getContext('2d');
 
-        // 【重要設定】請確認類別順序與你訓練模型時的 data.yaml 一致
+        // =========================================================================
+        // 【模型區 1：定義模型類別名稱】
+        // 必須與你在 Roboflow / YOLO 訓練時 data.yaml 的類別順序完全一致
+        // =========================================================================
         const CLASSES = ['crosswalk', 'traffic light'];
 
-        // 1. 載入 ONNX 模型
+        // =========================================================================
+        // 【模型區 2：載入 ONNX 模型檔案】
+        // 若你的模型檔名不同，請修改 './best.onnx'
+        // =========================================================================
         async function initModel() {
             try {
                 session = await ort.InferenceSession.create('./best.onnx');
-                statusDiv.innerText = "✅ 模型載入完成！請選擇包含紅綠燈或斑馬線的圖片進行辨識。";
+                statusDiv.innerText = "✅ 模型載入完成！請選擇圖片進行辨識。";
                 imageInput.disabled = false;
             } catch (e) {
                 statusDiv.innerText = "❌ 模型載入失敗，請確認 best.onnx 是否放在同目錄下。";
@@ -240,7 +237,6 @@
             }
         }
 
-        // 2. 圖片上傳與推理處理
         imageInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file || !session) return;
@@ -258,7 +254,11 @@
                 const tensor = await preprocessImage(img);
                 const results = await session.run({ images: tensor });
                 
-                const boxes = postprocess(results, img.width, img.height, 0.45);
+                // =================================================================
+                // 【模型區 3：設定模型信心度門檻 (Confidence Threshold)】
+                // 0.35 代表信心度 35% 以上才顯示框線，可依小物件偵測需求調整
+                // =================================================================
+                const boxes = postprocess(results, img.width, img.height, 0.35);
                 
                 ctx.drawImage(img, 0, 0);
                 
@@ -274,7 +274,7 @@
             };
         });
 
-        // 圖片預處理：轉為 1x3x640x640 張量
+        // 圖片預處理：縮放至 640x640 並轉為 Float32 Tensor
         async function preprocessImage(img) {
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = 640;
@@ -296,15 +296,18 @@
             return new ort.Tensor('float32', float32Data, [1, 3, 640, 640]);
         }
 
-        // 3. ONNX 輸出矩陣解析（自動支援多類別與單類別）
+        // =========================================================================
+        // 【模型區 4：ONNX 輸出張量解析與非極大值抑制 (NMS)】
+        // 解析 YOLO 輸出的預測矩陣 [1, 4 + numClasses, 8400]
+        // =========================================================================
         function postprocess(results, origW, origH, confThreshold) {
             const outputKey = Object.keys(results)[0];
             const outputTensor = results[outputKey];
             const data = outputTensor.data;
-            const dims = outputTensor.dims; // 通常為 [1, 4 + numClasses, 8400]
+            const dims = outputTensor.dims;
             
             const numFeatures = dims[1]; 
-            const numAnchors = dims[2];  // 預設 8400
+            const numAnchors = dims[2];
             const numClasses = numFeatures - 4;
             const boxes = [];
 
@@ -312,7 +315,6 @@
                 let maxScore = 0;
                 let classId = 0;
 
-                // 找出所有類別中分數最高的一個
                 for (let c = 0; c < numClasses; c++) {
                     const score = data[(4 + c) * numAnchors + i];
                     if (score > maxScore) {
@@ -339,7 +341,6 @@
             return filterOverlapBoxes(boxes);
         }
 
-        // 針對同類別進行非極大值抑制 (NMS)
         function filterOverlapBoxes(boxes) {
             let candidateBoxes = [...boxes];
             candidateBoxes.sort((a, b) => b.score - a.score);
@@ -362,7 +363,7 @@
             return intersection / union;
         }
 
-        // 4. 在 Canvas 繪製多類別標籤並動態產生報告面板
+        // 在 Canvas 繪製多類別標籤並動態產生報告面板
         function drawBoxes(boxes) {
             const imgHeight = canvas.height;
             
@@ -381,7 +382,7 @@
             }
 
             const crosswalks = boxes.filter(b => b.className === 'crosswalk');
-            const trafficLights = boxes.filter(b => b.className === 'traffic_light');
+            const trafficLights = boxes.filter(b => b.className === 'traffic light');
 
             let hasHighRisk = false;
             crosswalks.forEach(box => {
@@ -392,7 +393,6 @@
                 }
             });
 
-            // 決定報告面板樣式與文字
             let bgClass = "bg-primary-subtle border-primary";
             let overallColor = "#0d6efd";
             let riskStatus = "🔵 已偵測號誌（畫面無斑馬線）";
@@ -421,15 +421,14 @@
                 </div>
             `;
 
-            // 繪製所有目標框線
             boxes.forEach(box => {
-                let color = "#0d6efd"; // 預設紅綠燈使用亮藍色框 (#0d6efd)
+                let color = "#0d6efd"; // 紅綠燈預設亮藍色框
 
                 if (box.className === 'crosswalk') {
                     const distToBottom = imgHeight - (box.y + box.h);
                     const boxHeightRatio = box.h / imgHeight;
                     const isHighRisk = (distToBottom < imgHeight * 0.18) || (boxHeightRatio > 0.25);
-                    color = isHighRisk ? "#dc3545" : "#198754"; // 斑馬線高風險紅色、安全綠色
+                    color = isHighRisk ? "#dc3545" : "#198754";
                 }
 
                 ctx.strokeStyle = color;
@@ -447,7 +446,6 @@
             });
         }
 
-        // 啟動 ONNX 模型
         initModel();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
