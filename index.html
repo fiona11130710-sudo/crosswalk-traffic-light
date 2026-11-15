@@ -60,18 +60,17 @@
     </div>
 
     <script>
-        function enterSystem() {
-            const user = document.getElementById('userInput').value.trim();
-            const pass = document.getElementById('passInput').value.trim();
+       function enterSystem() {
+    const user = document.getElementById('userInput').value.trim();
+    const pass = document.getElementById('passInput').value.trim();
 
-            if (!user || !pass) {
-                document.getElementById('loginMsg').innerText = "⚠️ 請完整輸入帳號與通關密碼！";
-                return;
-            }
-
-            // 直接把輸入的密碼當作資料夾路徑跳轉，首頁原始碼完全不會暴露模型路徑
-            window.location.href = `./${pass}/system.html`;
-        }
+    if (pass === "workshop2026") {
+        // 直接跳轉到同一層的 system.html
+        window.location.href = "./system.html";
+    } else {
+        document.getElementById('loginMsg').innerText = "⚠️ 帳號或通關密碼錯誤！";
+    }
+}
     </script>
 </body>
 </html>
