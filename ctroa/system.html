@@ -1,12 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-        <script>
-    // 檢查是否從登入頁驗證通過，否則強制踢回 index.html（阻擋直接輸入網址並避免載入模型）
-    if (sessionStorage.getItem('isAuth') !== 'true') {
-        window.location.replace('index.html');
-    }
-</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>路口安全 AI 離線辨識系統 (ONNX Runtime)</title>
