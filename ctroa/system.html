@@ -234,7 +234,7 @@
         // =========================================================================
         async function initModel() {
             try {
-                session = await ort.InferenceSession.create('./best.onnx');
+                session = await ort.InferenceSession.create('./awebr28.onnx');
                 statusDiv.innerText = "✅ 模型載入完成！請選擇圖片進行辨識。";
                 imageInput.disabled = false;
             } catch (e) {
